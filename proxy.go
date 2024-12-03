@@ -45,10 +45,19 @@ func tlsTripper(req *http.Request, ctx *goproxy.ProxyCtx) (resp *http.Response, 
 
 	bodyData, err := ioutil.ReadAll(req.Body)
 	orPanic(err) // Handle read error
+
+	// take user agent if TLS_EXPOSE_UA
+	STRIP_UA := lookupEnv("TLS_EXPOSE_UA", "FALSE")
+	REQ_UA := req.Header.Get("User-Agent")
+	if STRIP_UA == "TRUE" && REQ_UA != "" {
+		ENV_UA = REQ_UA
+	}
+
 	var headers = make(map[string]string)
 	for k, v := range req.Header {
 		headers[k] = v[0]
 	}
+	headers["User-Agent"] = ENV_UA
 
 	response, err := client.Do(req.URL.String(), cycletls.Options{
 		Ja3:       ENV_JA3,
@@ -88,5 +97,6 @@ func main() {
 	})
 
 	addr := lookupEnv("TLS_PROXY_ADDR", ":8080")
+	log.Printf("Starting cycletls-proxy server on %s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, proxy)) // Start proxy server
 }

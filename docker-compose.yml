@@ -1,0 +1,15 @@
+services:
+  cycletls:
+    container_name: cycletls
+    image: ghcr.io/feederbox826/cycletls-proxy
+    user: 1000:1000
+    environment:
+    # replace with your own JA3 and UA from https://tls.peet.ws. Do not mix and match JA3 and UA from different browsers.
+    # default values listed below are from Firefox 134.0
+    #  - TLS_JA3=771,4865-4867-4866-49195-49199-52393-52392-49196-49200-49171-49172-156-157-47-53,0-23-65281-10-11-35-16-5-34-18-51-43-13-45-28-27-65037,4588-29-23-24-25-256-257,0
+    #  - TLS_UA=Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0
+    # allow useragent override from the client
+    #  - TLS_EXPOSE_UA=TRUE
+      - TLS_PROXY_ADDR=":8080"
+    ports:
+      - 8080:8080/tcp
